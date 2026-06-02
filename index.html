@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ICIE Canada</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f5f3ee;
+      --surface: #ffffff;
+      --ink: #20252b;
+      --muted: #66707d;
+      --line: #d8d4cc;
+      --blue: #1f5a96;
+      --teal: #0f766e;
+      --red: #b3261e;
+      --amber: #b7791f;
+      --green: #2f7d32;
+      --focus: #111827;
+    }
+    * { box-sizing: border-box; }
+    html, body { overflow-x: hidden; }
+    body {
+      margin: 0;
+      font-family: Candara, Aptos, Segoe UI, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    button, table, input { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+    .shell {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 28px 24px 44px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 18px;
+    }
+    header > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 56px);
+      line-height: 0.95;
+      letter-spacing: 0;
+      font-family: Georgia, Cambria, serif;
+    }
+    .lede {
+      margin: 10px 0 0;
+      max-width: 820px;
+      color: var(--muted);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+    .switcher {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      max-width: 100%;
+    }
+    .switcher button {
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 12px;
+      min-height: 38px;
+      min-width: 0;
+      white-space: normal;
+    }
+    .switcher button[aria-selected="true"] {
+      background: var(--ink);
+      color: #fff;
+    }
+    main {
+      display: grid;
+      gap: 22px;
+      margin-top: 22px;
+    }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+    .kpi {
+      background: var(--surface);
+      padding: 16px;
+      min-height: 104px;
+    }
+    .kpi span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .kpi strong {
+      display: block;
+      font-size: clamp(24px, 4vw, 40px);
+      line-height: 1;
+      letter-spacing: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(320px, 0.8fr);
+      gap: 22px;
+      align-items: start;
+    }
+    section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      min-width: 0;
+      max-width: 100%;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+    .section-head > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+    h2 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+    .caption {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+      margin: 4px 0 0;
+      overflow-wrap: anywhere;
+    }
+    .chart-wrap {
+      position: relative;
+      min-height: 420px;
+    }
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .axis { stroke: #a7a198; stroke-width: 1; }
+    .gridline { stroke: #ebe7df; stroke-width: 1; }
+    .line-daily { stroke: var(--blue); }
+    .line-30d { stroke: var(--teal); }
+    .line-12m { stroke: var(--amber); }
+    .series-line {
+      fill: none;
+      stroke-width: 2.5;
+    }
+    .dot {
+      fill: var(--surface);
+      stroke-width: 2;
+      transition: r 0.16s ease;
+    }
+    .dot:hover { r: 5; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 16px;
+      height: 3px;
+      margin-right: 6px;
+      vertical-align: middle;
+      background: var(--blue);
+    }
+    .legend span:nth-child(2)::before { background: var(--teal); }
+    .legend span:nth-child(3)::before { background: var(--amber); }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 8px 8px;
+      border-bottom: 1px solid #ebe7df;
+      text-align: left;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+    }
+    th {
+      color: var(--muted);
+      font-weight: 650;
+      background: #faf8f4;
+      position: sticky;
+      top: 0;
+    }
+    td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .table-scroll {
+      overflow: auto;
+      max-height: 380px;
+      border-top: 1px solid #ebe7df;
+    }
+    .peaks-scroll {
+      max-height: 300px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: #edf3f8;
+      color: var(--blue);
+      font-weight: 700;
+    }
+    .bars {
+      display: grid;
+      gap: 9px;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr) 54px;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+    }
+    .bar-track {
+      height: 10px;
+      background: #ede8de;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 999px;
+    }
+    .bar-row:nth-child(2n) .bar-fill { background: var(--blue); }
+    .bar-value {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+    }
+    .note-box {
+      border-left: 4px solid var(--amber);
+      padding: 10px 12px;
+      background: #fff8eb;
+      color: #514333;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+    .detail-panel {
+      margin-top: 16px;
+      border: 1px solid #ebe7df;
+      border-radius: 8px;
+      padding: 14px;
+      background: #faf8f4;
+    }
+    .detail-panel h3 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+    .detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid #d8d4cc;
+      border-radius: 999px;
+      padding: 3px 9px;
+      background: var(--surface);
+    }
+    .detail-panel p {
+      margin: 0 0 10px;
+      line-height: 1.45;
+      color: #39414a;
+    }
+    .source-list {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .source-list a {
+      color: var(--blue);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      overflow-wrap: anywhere;
+    }
+    .peak-button {
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      padding: 0;
+      text-align: left;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    tr[aria-selected="true"] {
+      background: #edf3f8;
+    }
+    footer {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+    @media (max-width: 920px) {
+      header, .workspace, .mini-grid {
+        grid-template-columns: 1fr;
+      }
+      .workspace > *, .mini-grid > * {
+        min-width: 0;
+      }
+      .kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .switcher {
+        width: 100%;
+      }
+      .switcher button {
+        flex: 1;
+        padding-inline: 8px;
+      }
+    }
+    @media (max-width: 560px) {
+      body { width: 100vw; }
+      .shell {
+        width: 100%;
+        max-width: 390px;
+        margin: 0;
+        padding: 18px 12px 32px;
+        overflow: hidden;
+      }
+      header { overflow: hidden; }
+      .lede {
+        width: 100%;
+        max-width: 100%;
+      }
+      .switcher {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+      .switcher button {
+        font-size: 12px;
+        line-height: 1.2;
+      }
+      .kpis { grid-template-columns: 1fr; }
+      section { padding: 14px; }
+      th, td { padding: 7px 6px; }
+      .chart-wrap { min-height: 300px; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div>
+      <h1>ICIE Canada</h1>
+      <p class="lede">Tableau de bord de l'indice canadien d'incertitude economique fonde sur Google Trends. Deux lectures sont disponibles : recente pour la surveillance courte, historique pour l'analyse des episodes depuis 2020.</p>
+    </div>
+    <nav class="switcher" aria-label="Choix de la version">
+      <button type="button" data-version="recent" aria-selected="true">v1.2 recente</button>
+      <button type="button" data-version="historical" aria-selected="false">v1.3 historique</button>
+    </nav>
+  </header>
+  <main>
+    <div class="kpis" aria-label="Indicateurs cles">
+      <div class="kpi"><span>Derniere valeur</span><strong id="kpi-latest"></strong></div>
+      <div class="kpi"><span>Date recente</span><strong id="kpi-date"></strong></div>
+      <div class="kpi"><span>Observations</span><strong id="kpi-count"></strong></div>
+      <div class="kpi"><span>Frequence</span><strong id="kpi-cadence"></strong></div>
+    </div>
+    <div class="workspace">
+      <section>
+        <div class="section-head">
+          <div>
+            <h2 id="series-title">Serie Canada</h2>
+            <p class="caption" id="series-caption"></p>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <svg id="series-chart" viewBox="0 0 980 420" role="img" aria-label="Serie ICIE Canada"></svg>
+          <div class="legend"><span>daily</span><span>30d</span><span>12m</span></div>
+        </div>
+      </section>
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Regions et categories</h2>
+            <p class="caption">Classement sur la derniere date disponible.</p>
+          </div>
+        </div>
+        <div class="bars" id="region-bars"></div>
+        <div class="note-box" id="version-note" style="margin-top:16px"></div>
+      </section>
+    </div>
+    <div class="mini-grid">
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Audit des pics</h2>
+            <p class="caption">Dates les plus elevees et composantes dominantes.</p>
+          </div>
+        </div>
+        <div class="table-scroll peaks-scroll" id="peaks-table"></div>
+        <div class="detail-panel" id="peak-detail" aria-live="polite"></div>
+      </section>
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Validation externe</h2>
+            <p class="caption">Meilleure correlation par indicateur externe.</p>
+          </div>
+        </div>
+        <div class="table-scroll" id="correlation-table"></div>
+      </section>
+    </div>
+    <div class="mini-grid">
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Categories</h2>
+            <p class="caption">Moyenne regionale standardisee sur la derniere date.</p>
+          </div>
+        </div>
+        <div class="bars" id="category-bars"></div>
+      </section>
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>Correlations contemporaines</h2>
+            <p class="caption">Lecture sans decalage temporel.</p>
+          </div>
+        </div>
+        <div class="table-scroll" id="contemporaneous-table"></div>
+      </section>
+    </div>
+  </main>
+  <footer>
+    Les valeurs sont standardisees avec moyenne 100 et ecart type 30 par serie. Les sorties du dashboard sont descriptives et doivent etre lues avec les notes methodologiques du projet.
+  </footer>
+</div>
+<script id="dashboard-data" type="application/json">{"recent": {"version": "recent", "label": "v1.2 recente", "title": "Lecture recente", "subtitle": "12 derniers mois, observations hebdomadaires datees", "cadence": "hebdomadaire", "note": "Version utile pour surveiller les mouvements recents. Les donnees Google Trends proviennent de la fenetre today 12-m.", "dateRange": "2025-06-01 a 2026-05-31", "latestDate": "2026-05-31", "latestIndex": 104.2, "latestRaw": 101.83, "observations": 53, "series": {"daily": [{"date": "2025-06-01", "value": 87.59}, {"date": "2025-06-08", "value": 73.92}, {"date": "2025-06-15", "value": 54.76}, {"date": "2025-06-22", "value": 47.53}, {"date": "2025-06-29", "value": 57.92}, {"date": "2025-07-06", "value": 70.81}, {"date": "2025-07-13", "value": 59.4}, {"date": "2025-07-20", "value": 64.62}, {"date": "2025-07-27", "value": 105.76}, {"date": "2025-08-03", "value": 96.33}, {"date": "2025-08-10", "value": 70.7}, {"date": "2025-08-17", "value": 68.54}, {"date": "2025-08-24", "value": 72.62}, {"date": "2025-08-31", "value": 92.81}, {"date": "2025-09-07", "value": 117.95}, {"date": "2025-09-14", "value": 158.54}, {"date": "2025-09-21", "value": 82.07}, {"date": "2025-09-28", "value": 109.99}, {"date": "2025-10-05", "value": 78.32}, {"date": "2025-10-12", "value": 94.75}, {"date": "2025-10-19", "value": 107.62}, {"date": "2025-10-26", "value": 147.26}, {"date": "2025-11-02", "value": 121.54}, {"date": "2025-11-09", "value": 102.22}, {"date": "2025-11-16", "value": 143.12}, {"date": "2025-11-23", "value": 107.84}, {"date": "2025-11-30", "value": 127.58}, {"date": "2025-12-07", "value": 99.86}, {"date": "2025-12-14", "value": 85.04}, {"date": "2025-12-21", "value": 60.5}, {"date": "2025-12-28", "value": 55.56}, {"date": "2026-01-04", "value": 102.49}, {"date": "2026-01-11", "value": 112.57}, {"date": "2026-01-18", "value": 96.19}, {"date": "2026-01-25", "value": 115.7}, {"date": "2026-02-01", "value": 156.76}, {"date": "2026-02-08", "value": 143.28}, {"date": "2026-02-15", "value": 130.51}, {"date": "2026-02-22", "value": 141.8}, {"date": "2026-03-01", "value": 152.93}, {"date": "2026-03-08", "value": 109.24}, {"date": "2026-03-15", "value": 132.92}, {"date": "2026-03-22", "value": 140.39}, {"date": "2026-03-29", "value": 116.71}, {"date": "2026-04-05", "value": 125.91}, {"date": "2026-04-12", "value": 99.93}, {"date": "2026-04-19", "value": 87.73}, {"date": "2026-04-26", "value": 115.64}, {"date": "2026-05-03", "value": 94.88}, {"date": "2026-05-10", "value": 74.1}, {"date": "2026-05-17", "value": 50.15}, {"date": "2026-05-24", "value": 72.91}, {"date": "2026-05-31", "value": 104.2}], "30d": [{"date": "2025-06-01", "value": 83.87}, {"date": "2025-06-08", "value": 74.97}, {"date": "2025-06-15", "value": 63.68}, {"date": "2025-06-22", "value": 55.69}, {"date": "2025-06-29", "value": 53.6}, {"date": "2025-07-06", "value": 49.23}, {"date": "2025-07-13", "value": 45.45}, {"date": "2025-07-20", "value": 48.02}, {"date": "2025-07-27", "value": 63.18}, {"date": "2025-08-03", "value": 73.19}, {"date": "2025-08-10", "value": 73.16}, {"date": "2025-08-17", "value": 75.54}, {"date": "2025-08-24", "value": 77.62}, {"date": "2025-08-31", "value": 74.25}, {"date": "2025-09-07", "value": 79.88}, {"date": "2025-09-14", "value": 102.76}, {"date": "2025-09-21", "value": 106.29}, {"date": "2025-09-28", "value": 116.02}, {"date": "2025-10-05", "value": 112.24}, {"date": "2025-10-12", "value": 106.2}, {"date": "2025-10-19", "value": 92.93}, {"date": "2025-10-26", "value": 109.91}, {"date": "2025-11-02", "value": 112.92}, {"date": "2025-11-09", "value": 119.15}, {"date": "2025-11-16", "value": 131.75}, {"date": "2025-11-23", "value": 131.81}, {"date": "2025-11-30", "value": 126.68}, {"date": "2025-12-07", "value": 121.03}, {"date": "2025-12-14", "value": 116.56}, {"date": "2025-12-21", "value": 95.04}, {"date": "2025-12-28", "value": 81.42}, {"date": "2026-01-04", "value": 74.88}, {"date": "2026-01-11", "value": 78.2}, {"date": "2026-01-18", "value": 81.1}, {"date": "2026-01-25", "value": 95.48}, {"date": "2026-02-01", "value": 121.84}, {"date": "2026-02-08", "value": 132.46}, {"date": "2026-02-15", "value": 137.14}, {"date": "2026-02-22", "value": 149.01}, {"date": "2026-03-01", "value": 158.71}, {"date": "2026-03-08", "value": 146.33}, {"date": "2026-03-15", "value": 143.64}, {"date": "2026-03-22", "value": 146.21}, {"date": "2026-03-29", "value": 139.68}, {"date": "2026-04-05", "value": 132.64}, {"date": "2026-04-12", "value": 130.21}, {"date": "2026-04-19", "value": 118.44}, {"date": "2026-04-26", "value": 112.0}, {"date": "2026-05-03", "value": 106.31}, {"date": "2026-05-10", "value": 92.82}, {"date": "2026-05-17", "value": 79.85}, {"date": "2026-05-24", "value": 75.99}, {"date": "2026-05-31", "value": 73.01}], "12m": [{"date": "2025-06-01", "value": 99.76}, {"date": "2025-06-08", "value": 83.05}, {"date": "2025-06-15", "value": 61.86}, {"date": "2025-06-22", "value": 46.84}, {"date": "2025-06-29", "value": 42.92}, {"date": "2025-07-06", "value": 45.55}, {"date": "2025-07-13", "value": 43.45}, {"date": "2025-07-20", "value": 43.47}, {"date": "2025-07-27", "value": 54.66}, {"date": "2025-08-03", "value": 61.31}, {"date": "2025-08-10", "value": 61.05}, {"date": "2025-08-17", "value": 60.4}, {"date": "2025-08-24", "value": 60.61}, {"date": "2025-08-31", "value": 64.32}, {"date": "2025-09-07", "value": 71.63}, {"date": "2025-09-14", "value": 84.23}, {"date": "2025-09-21", "value": 84.35}, {"date": "2025-09-28", "value": 88.25}, {"date": "2025-10-05", "value": 87.66}, {"date": "2025-10-12", "value": 89.15}, {"date": "2025-10-19", "value": 91.98}, {"date": "2025-10-26", "value": 98.97}, {"date": "2025-11-02", "value": 102.61}, {"date": "2025-11-09", "value": 103.99}, {"date": "2025-11-16", "value": 109.25}, {"date": "2025-11-23", "value": 110.79}, {"date": "2025-11-30", "value": 114.0}, {"date": "2025-12-07", "value": 114.57}, {"date": "2025-12-14", "value": 113.84}, {"date": "2025-12-21", "value": 111.16}, {"date": "2025-12-28", "value": 108.27}, {"date": "2026-01-04", "value": 109.14}, {"date": "2026-01-11", "value": 110.71}, {"date": "2026-01-18", "value": 111.01}, {"date": "2026-01-25", "value": 112.65}, {"date": "2026-02-01", "value": 116.99}, {"date": "2026-02-08", "value": 120.2}, {"date": "2026-02-15", "value": 122.43}, {"date": "2026-02-22", "value": 125.25}, {"date": "2026-03-01", "value": 128.6}, {"date": "2026-03-08", "value": 129.19}, {"date": "2026-03-15", "value": 131.13}, {"date": "2026-03-22", "value": 133.4}, {"date": "2026-03-29", "value": 134.26}, {"date": "2026-04-05", "value": 135.57}, {"date": "2026-04-12", "value": 135.45}, {"date": "2026-04-19", "value": 134.7}, {"date": "2026-04-26", "value": 135.4}, {"date": "2026-05-03", "value": 135.04}, {"date": "2026-05-10", "value": 133.67}, {"date": "2026-05-17", "value": 131.21}, {"date": "2026-05-24", "value": 129.92}, {"date": "2026-05-31", "value": 130.12}]}, "regions": [{"province": "BC", "value": 125.98}, {"province": "SK", "value": 112.09}, {"province": "ON", "value": 111.25}, {"province": "NL", "value": 105.61}, {"province": "MB", "value": 103.48}, {"province": "QC", "value": 93.93}, {"province": "NT", "value": 87.3}, {"province": "AB", "value": 85.2}, {"province": "NU", "value": 83.55}, {"province": "NS", "value": 78.37}, {"province": "YT", "value": 74.97}, {"province": "NB", "value": 59.74}, {"province": "PE", "value": 43.36}], "categories": [{"category": "macro_conditions", "value": 236.79}, {"category": "energy_commodities", "value": 95.75}, {"category": "monetary_policy", "value": 91.04}, {"category": "trade_geopolitics", "value": 79.65}, {"category": "inflation_prices", "value": 73.82}, {"category": "consumption_finances", "value": 70.41}, {"category": "business_conditions", "value": 68.73}, {"category": "labor_market", "value": 61.44}, {"category": "housing_credit", "value": 56.55}], "peaks": [{"rank": 1, "date": "2025-09-14", "value": 158.54, "region": "ON", "category": "monetary_policy", "term": "mortgage", "detail": {}}, {"rank": 2, "date": "2026-02-01", "value": 156.76, "region": "ON", "category": "business_conditions", "term": "investment", "detail": {}}, {"rank": 3, "date": "2026-03-01", "value": 152.93, "region": "ON", "category": "energy_commodities", "term": "energy", "detail": {}}, {"rank": 4, "date": "2025-10-26", "value": 147.26, "region": "ON", "category": "monetary_policy", "term": "interest rates", "detail": {}}, {"rank": 5, "date": "2026-02-08", "value": 143.28, "region": "ON", "category": "consumption_finances", "term": "sales", "detail": {}}, {"rank": 6, "date": "2025-11-16", "value": 143.12, "region": "ON", "category": "business_conditions", "term": "sales", "detail": {}}, {"rank": 7, "date": "2026-02-22", "value": 141.8, "region": "ON", "category": "consumption_finances", "term": "investment", "detail": {}}, {"rank": 8, "date": "2026-03-22", "value": 140.39, "region": "ON", "category": "energy_commodities", "term": "prices", "detail": {}}, {"rank": 9, "date": "2026-03-15", "value": 132.92, "region": "ON", "category": "energy_commodities", "term": "prices", "detail": {}}, {"rank": 10, "date": "2026-02-15", "value": 130.51, "region": "ON", "category": "trade_geopolitics", "term": "demand", "detail": {}}], "correlations": [{"indicator": "cpi_all_items_yoy_pct", "label": "IPC total, variation annuelle", "lag": -2, "n": 9, "correlation": 0.795}, {"indicator": "target_overnight_rate_pct", "label": "Taux cible du financement a un jour", "lag": -1, "n": 11, "correlation": -0.734}, {"indicator": "target_overnight_rate_change_pp", "label": "Taux cible, variation mensuelle", "lag": -3, "n": 9, "correlation": 0.626}, {"indicator": "cpi_all_items_mom_pct", "label": "IPC total, variation mensuelle", "lag": 0, "n": 11, "correlation": 0.612}, {"indicator": "gasoline_yoy_pct", "label": "Essence, variation annuelle", "lag": -1, "n": 10, "correlation": 0.607}, {"indicator": "gasoline_mom_pct", "label": "Essence, variation mensuelle", "lag": 0, "n": 11, "correlation": 0.54}, {"indicator": "unemployment_rate_pct", "label": "Taux de chomage", "lag": -2, "n": 9, "correlation": -0.534}, {"indicator": "unemployment_rate_change_pp", "label": "Taux de chomage, variation mensuelle", "lag": -3, "n": 8, "correlation": 0.488}], "contemporaneous": [{"indicator": "cpi_all_items_mom_pct", "label": "IPC total, variation mensuelle", "lag": 0, "n": 11, "correlation": 0.612}, {"indicator": "target_overnight_rate_pct", "label": "Taux cible du financement a un jour", "lag": 0, "n": 12, "correlation": -0.591}, {"indicator": "gasoline_mom_pct", "label": "Essence, variation mensuelle", "lag": 0, "n": 11, "correlation": 0.54}, {"indicator": "unemployment_rate_pct", "label": "Taux de chomage", "lag": 0, "n": 11, "correlation": -0.406}, {"indicator": "gasoline_yoy_pct", "label": "Essence, variation annuelle", "lag": 0, "n": 11, "correlation": 0.3}, {"indicator": "cpi_all_items_yoy_pct", "label": "IPC total, variation annuelle", "lag": 0, "n": 11, "correlation": 0.278}, {"indicator": "target_overnight_rate_change_pp", "label": "Taux cible, variation mensuelle", "lag": 0, "n": 12, "correlation": -0.214}, {"indicator": "unemployment_rate_change_pp", "label": "Taux de chomage, variation mensuelle", "lag": 0, "n": 11, "correlation": -0.091}]}, "historical": {"version": "historical", "label": "v1.3 historique", "title": "Lecture historique", "subtitle": "Janvier 2020 a mai 2026, observations mensuelles", "cadence": "mensuelle", "note": "Version utile pour lire les grands episodes historiques. Sur cette fenetre longue, Google Trends renvoie des observations mensuelles.", "dateRange": "2020-01-01 a 2026-05-01", "latestDate": "2026-05-01", "latestIndex": 102.41, "latestRaw": 101.22, "observations": 77, "series": {"daily": [{"date": "2020-01-01", "value": 59.54}, {"date": "2020-02-01", "value": 71.0}, {"date": "2020-03-01", "value": 179.15}, {"date": "2020-04-01", "value": 129.71}, {"date": "2020-05-01", "value": 74.34}, {"date": "2020-06-01", "value": 61.44}, {"date": "2020-07-01", "value": 58.39}, {"date": "2020-08-01", "value": 62.03}, {"date": "2020-09-01", "value": 79.25}, {"date": "2020-10-01", "value": 78.52}, {"date": "2020-11-01", "value": 83.07}, {"date": "2020-12-01", "value": 81.63}, {"date": "2021-01-01", "value": 103.18}, {"date": "2021-02-01", "value": 78.62}, {"date": "2021-03-01", "value": 84.26}, {"date": "2021-04-01", "value": 76.85}, {"date": "2021-05-01", "value": 64.47}, {"date": "2021-06-01", "value": 46.31}, {"date": "2021-07-01", "value": 41.89}, {"date": "2021-08-01", "value": 45.91}, {"date": "2021-09-01", "value": 64.31}, {"date": "2021-10-01", "value": 85.85}, {"date": "2021-11-01", "value": 88.9}, {"date": "2021-12-01", "value": 64.8}, {"date": "2022-01-01", "value": 85.91}, {"date": "2022-02-01", "value": 97.53}, {"date": "2022-03-01", "value": 152.13}, {"date": "2022-04-01", "value": 121.34}, {"date": "2022-05-01", "value": 98.84}, {"date": "2022-06-01", "value": 108.03}, {"date": "2022-07-01", "value": 112.09}, {"date": "2022-08-01", "value": 80.39}, {"date": "2022-09-01", "value": 103.39}, {"date": "2022-10-01", "value": 159.59}, {"date": "2022-11-01", "value": 113.08}, {"date": "2022-12-01", "value": 75.53}, {"date": "2023-01-01", "value": 120.49}, {"date": "2023-02-01", "value": 84.08}, {"date": "2023-03-01", "value": 118.86}, {"date": "2023-04-01", "value": 95.23}, {"date": "2023-05-01", "value": 110.15}, {"date": "2023-06-01", "value": 83.34}, {"date": "2023-07-01", "value": 76.06}, {"date": "2023-08-01", "value": 76.01}, {"date": "2023-09-01", "value": 103.56}, {"date": "2023-10-01", "value": 102.85}, {"date": "2023-11-01", "value": 109.22}, {"date": "2023-12-01", "value": 108.1}, {"date": "2024-01-01", "value": 72.38}, {"date": "2024-02-01", "value": 114.69}, {"date": "2024-03-01", "value": 110.24}, {"date": "2024-04-01", "value": 114.51}, {"date": "2024-05-01", "value": 83.7}, {"date": "2024-06-01", "value": 78.7}, {"date": "2024-07-01", "value": 91.36}, {"date": "2024-08-01", "value": 76.08}, {"date": "2024-09-01", "value": 120.44}, {"date": "2024-10-01", "value": 124.12}, {"date": "2024-11-01", "value": 122.12}, {"date": "2024-12-01", "value": 106.14}, {"date": "2025-01-01", "value": 131.62}, {"date": "2025-02-01", "value": 123.16}, {"date": "2025-03-01", "value": 170.42}, {"date": "2025-04-01", "value": 158.88}, {"date": "2025-05-01", "value": 93.46}, {"date": "2025-06-01", "value": 85.6}, {"date": "2025-07-01", "value": 90.43}, {"date": "2025-08-01", "value": 91.96}, {"date": "2025-09-01", "value": 133.54}, {"date": "2025-10-01", "value": 128.77}, {"date": "2025-11-01", "value": 137.75}, {"date": "2025-12-01", "value": 110.52}, {"date": "2026-01-01", "value": 121.2}, {"date": "2026-02-01", "value": 167.87}, {"date": "2026-03-01", "value": 147.81}, {"date": "2026-04-01", "value": 130.9}, {"date": "2026-05-01", "value": 102.41}], "30d": [{"date": "2020-01-01", "value": 57.86}, {"date": "2020-02-01", "value": 70.25}, {"date": "2020-03-01", "value": 128.68}, {"date": "2020-04-01", "value": 133.69}, {"date": "2020-05-01", "value": 73.86}, {"date": "2020-06-01", "value": 59.92}, {"date": "2020-07-01", "value": 56.62}, {"date": "2020-08-01", "value": 60.56}, {"date": "2020-09-01", "value": 79.17}, {"date": "2020-10-01", "value": 78.37}, {"date": "2020-11-01", "value": 83.29}, {"date": "2020-12-01", "value": 81.74}, {"date": "2021-01-01", "value": 105.02}, {"date": "2021-02-01", "value": 78.48}, {"date": "2021-03-01", "value": 81.53}, {"date": "2021-04-01", "value": 76.57}, {"date": "2021-05-01", "value": 63.19}, {"date": "2021-06-01", "value": 43.57}, {"date": "2021-07-01", "value": 38.79}, {"date": "2021-08-01", "value": 43.14}, {"date": "2021-09-01", "value": 63.02}, {"date": "2021-10-01", "value": 86.29}, {"date": "2021-11-01", "value": 89.59}, {"date": "2021-12-01", "value": 63.55}, {"date": "2022-01-01", "value": 86.36}, {"date": "2022-02-01", "value": 98.92}, {"date": "2022-03-01", "value": 128.42}, {"date": "2022-04-01", "value": 124.64}, {"date": "2022-05-01", "value": 100.33}, {"date": "2022-06-01", "value": 110.26}, {"date": "2022-07-01", "value": 114.65}, {"date": "2022-08-01", "value": 80.4}, {"date": "2022-09-01", "value": 105.25}, {"date": "2022-10-01", "value": 165.98}, {"date": "2022-11-01", "value": 115.72}, {"date": "2022-12-01", "value": 75.15}, {"date": "2023-01-01", "value": 123.73}, {"date": "2023-02-01", "value": 84.38}, {"date": "2023-03-01", "value": 103.17}, {"date": "2023-04-01", "value": 96.43}, {"date": "2023-05-01", "value": 112.55}, {"date": "2023-06-01", "value": 83.59}, {"date": "2023-07-01", "value": 75.72}, {"date": "2023-08-01", "value": 75.67}, {"date": "2023-09-01", "value": 105.44}, {"date": "2023-10-01", "value": 104.67}, {"date": "2023-11-01", "value": 111.55}, {"date": "2023-12-01", "value": 110.34}, {"date": "2024-01-01", "value": 71.74}, {"date": "2024-02-01", "value": 117.45}, {"date": "2024-03-01", "value": 115.05}, {"date": "2024-04-01", "value": 117.26}, {"date": "2024-05-01", "value": 83.97}, {"date": "2024-06-01", "value": 78.57}, {"date": "2024-07-01", "value": 92.25}, {"date": "2024-08-01", "value": 75.73}, {"date": "2024-09-01", "value": 123.68}, {"date": "2024-10-01", "value": 127.65}, {"date": "2024-11-01", "value": 125.49}, {"date": "2024-12-01", "value": 108.22}, {"date": "2025-01-01", "value": 135.75}, {"date": "2025-02-01", "value": 126.61}, {"date": "2025-03-01", "value": 152.14}, {"date": "2025-04-01", "value": 165.21}, {"date": "2025-05-01", "value": 94.52}, {"date": "2025-06-01", "value": 86.02}, {"date": "2025-07-01", "value": 91.25}, {"date": "2025-08-01", "value": 92.9}, {"date": "2025-09-01", "value": 137.83}, {"date": "2025-10-01", "value": 132.68}, {"date": "2025-11-01", "value": 142.37}, {"date": "2025-12-01", "value": 112.95}, {"date": "2026-01-01", "value": 124.49}, {"date": "2026-02-01", "value": 174.93}, {"date": "2026-03-01", "value": 164.08}, {"date": "2026-04-01", "value": 134.98}, {"date": "2026-05-01", "value": 104.19}], "12m": [{"date": "2020-01-01", "value": 31.14}, {"date": "2020-02-01", "value": 41.67}, {"date": "2020-03-01", "value": 111.45}, {"date": "2020-04-01", "value": 123.62}, {"date": "2020-05-01", "value": 110.57}, {"date": "2020-06-01", "value": 97.92}, {"date": "2020-07-01", "value": 88.08}, {"date": "2020-08-01", "value": 81.53}, {"date": "2020-09-01", "value": 79.96}, {"date": "2020-10-01", "value": 78.57}, {"date": "2020-11-01", "value": 78.19}, {"date": "2020-12-01", "value": 77.65}, {"date": "2021-01-01", "value": 84.34}, {"date": "2021-02-01", "value": 85.51}, {"date": "2021-03-01", "value": 70.97}, {"date": "2021-04-01", "value": 62.87}, {"date": "2021-05-01", "value": 61.36}, {"date": "2021-06-01", "value": 59.04}, {"date": "2021-07-01", "value": 56.51}, {"date": "2021-08-01", "value": 54.04}, {"date": "2021-09-01", "value": 51.75}, {"date": "2021-10-01", "value": 52.88}, {"date": "2021-11-01", "value": 53.77}, {"date": "2021-12-01", "value": 51.19}, {"date": "2022-01-01", "value": 48.54}, {"date": "2022-02-01", "value": 51.44}, {"date": "2022-03-01", "value": 61.84}, {"date": "2022-04-01", "value": 68.65}, {"date": "2022-05-01", "value": 73.92}, {"date": "2022-06-01", "value": 83.37}, {"date": "2022-07-01", "value": 94.13}, {"date": "2022-08-01", "value": 99.41}, {"date": "2022-09-01", "value": 105.4}, {"date": "2022-10-01", "value": 116.69}, {"date": "2022-11-01", "value": 120.4}, {"date": "2022-12-01", "value": 122.04}, {"date": "2023-01-01", "value": 127.34}, {"date": "2023-02-01", "value": 125.28}, {"date": "2023-03-01", "value": 120.18}, {"date": "2023-04-01", "value": 116.18}, {"date": "2023-05-01", "value": 117.92}, {"date": "2023-06-01", "value": 114.13}, {"date": "2023-07-01", "value": 108.61}, {"date": "2023-08-01", "value": 107.94}, {"date": "2023-09-01", "value": 107.97}, {"date": "2023-10-01", "value": 99.28}, {"date": "2023-11-01", "value": 98.69}, {"date": "2023-12-01", "value": 103.67}, {"date": "2024-01-01", "value": 96.3}, {"date": "2024-02-01", "value": 100.99}, {"date": "2024-03-01", "value": 99.67}, {"date": "2024-04-01", "value": 102.63}, {"date": "2024-05-01", "value": 98.57}, {"date": "2024-06-01", "value": 97.86}, {"date": "2024-07-01", "value": 100.21}, {"date": "2024-08-01", "value": 100.22}, {"date": "2024-09-01", "value": 102.8}, {"date": "2024-10-01", "value": 106.06}, {"date": "2024-11-01", "value": 108.04}, {"date": "2024-12-01", "value": 107.74}, {"date": "2025-01-01", "value": 116.81}, {"date": "2025-02-01", "value": 118.11}, {"date": "2025-03-01", "value": 127.33}, {"date": "2025-04-01", "value": 134.13}, {"date": "2025-05-01", "value": 135.62}, {"date": "2025-06-01", "value": 136.68}, {"date": "2025-07-01", "value": 136.54}, {"date": "2025-08-01", "value": 138.97}, {"date": "2025-09-01", "value": 140.98}, {"date": "2025-10-01", "value": 141.69}, {"date": "2025-11-01", "value": 144.08}, {"date": "2025-12-01", "value": 144.75}, {"date": "2026-01-01", "value": 143.16}, {"date": "2026-02-01", "value": 150.01}, {"date": "2026-03-01", "value": 146.54}, {"date": "2026-04-01", "value": 142.26}, {"date": "2026-05-01", "value": 143.63}]}, "regions": [{"province": "NT", "value": 127.0}, {"province": "QC", "value": 121.73}, {"province": "NL", "value": 118.83}, {"province": "BC", "value": 109.75}, {"province": "YT", "value": 105.85}, {"province": "NS", "value": 105.47}, {"province": "PE", "value": 100.92}, {"province": "NU", "value": 100.44}, {"province": "NB", "value": 99.53}, {"province": "AB", "value": 96.79}, {"province": "SK", "value": 92.39}, {"province": "ON", "value": 90.96}, {"province": "MB", "value": 86.63}], "categories": [{"category": "inflation_prices", "value": 125.01}, {"category": "energy_commodities", "value": 114.22}, {"category": "consumption_finances", "value": 106.48}, {"category": "business_conditions", "value": 103.68}, {"category": "housing_credit", "value": 100.98}, {"category": "macro_conditions", "value": 98.67}, {"category": "monetary_policy", "value": 92.36}, {"category": "trade_geopolitics", "value": 91.68}, {"category": "labor_market", "value": 90.28}], "peaks": [{"rank": 1, "date": "2020-03-01", "value": 179.15, "region": "ON", "category": "macro_conditions", "term": "unemployment", "detail": {"title": "COVID labour shock", "summary": "March 2020 corresponds to the COVID labour-market shock. Statistics Canada reports a sharp employment decline and higher unemployment, while the Bank of Canada lowered the target rate on March 27 to support the financial system and the economy.", "evaluation": "Fortement compatible", "sources": [{"label": "StatCan labour force March 2020", "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/200409/dq200409a-eng.htm"}, {"label": "Bank of Canada March 27 2020", "url": "https://www.bankofcanada.ca/2020/03/press-release-2020-03-27/"}]}}, {"rank": 2, "date": "2025-03-01", "value": 170.42, "region": "ON", "category": "trade_geopolitics", "term": "tariffs", "detail": {"title": "Tariffs and trade uncertainty", "summary": "March 2025 is directly tied to new US tariffs on Canadian goods and Canadian countermeasures. The Bank of Canada also published an analysis on tariffs and trade uncertainty hurting the Canadian economy.", "evaluation": "Fortement compatible", "sources": [{"label": "Bank of Canada tariffs analysis", "url": "https://www.bankofcanada.ca/2025/03/tariffs-and-trade-uncertainty-hurting-canadian-economy/"}, {"label": "StatCan merchandise trade March 2025", "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/250506/dq250506a-eng.htm"}]}}, {"rank": 3, "date": "2026-02-01", "value": 167.87, "region": "ON", "category": "business_conditions", "term": "costs", "detail": {"title": "Business costs and tariffs", "summary": "The Bank of Canada indicated in January 2026 that US tariffs and unpredictable trade arrangements were disrupting the economy. Its opening statement also mentions tariff-related cost pressures.", "evaluation": "Compatible", "sources": [{"label": "Bank of Canada MPR January 2026", "url": "https://www.bankofcanada.ca/publications/mpr/mpr-2026-01-28/"}, {"label": "Bank of Canada opening statement January 2026", "url": "https://www.bankofcanada.ca/2026/01/opening-statement-2026-01-28/"}]}}, {"rank": 4, "date": "2022-10-01", "value": 159.59, "region": "ON", "category": "macro_conditions", "term": "recession", "detail": {"title": "Recession expectations", "summary": "In October 2022, the Bank of Canada continued tightening policy while inflation remained too high. The 2022 Q3 CSCE reported that many consumers expected a recession in the next 12 months.", "evaluation": "Fortement compatible", "sources": [{"label": "Bank of Canada CSCE Q3 2022", "url": "https://www.bankofcanada.ca/2022/10/canadian-survey-of-consumer-expectations-third-quarter-of-2022/"}, {"label": "Bank of Canada Annual Report 2022", "url": "https://www.bankofcanada.ca/publications/annual-reports-quarterly-financial-reports/annual-report-2022/monetary-policy/"}]}}, {"rank": 5, "date": "2025-04-01", "value": 158.88, "region": "ON", "category": "trade_geopolitics", "term": "tariffs", "detail": {"title": "Tariff escalation", "summary": "The April 2025 Monetary Policy Report describes trade-conflict escalation, tariffs on steel, aluminum and vehicles, and high uncertainty around US trade policy.", "evaluation": "Fortement compatible", "sources": [{"label": "Bank of Canada MPR April 2025", "url": "https://www.bankofcanada.ca/publications/mpr/mpr-2025-04-16/overview/"}]}}, {"rank": 6, "date": "2022-03-01", "value": 152.13, "region": "ON", "category": "energy_commodities", "term": "energy", "detail": {"title": "Energy and Ukraine shock", "summary": "Statistics Canada reports sharply higher gasoline prices in March 2022 amid supply uncertainty linked to Russia's invasion of Ukraine. The Bank of Canada also links 2022 inflation to global energy and food prices.", "evaluation": "Fortement compatible", "sources": [{"label": "StatCan CPI March 2022", "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/220420/dq220420a-eng.htm"}, {"label": "Bank of Canada Annual Report 2022", "url": "https://www.bankofcanada.ca/publications/annual-reports-quarterly-financial-reports/annual-report-2022/monetary-policy/"}]}}, {"rank": 7, "date": "2026-03-01", "value": 147.81, "region": "ON", "category": "energy_commodities", "term": "energy", "detail": {"title": "Energy price acceleration", "summary": "The March 2026 CPI release indicates that inflation acceleration mainly came from energy, especially gasoline, linked to the conflict in the Middle East.", "evaluation": "Fortement compatible", "sources": [{"label": "StatCan CPI March 2026", "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260420/dq260420a-eng.htm"}]}}, {"rank": 8, "date": "2025-11-01", "value": 137.75, "region": "ON", "category": "business_conditions", "term": "sales", "detail": {"title": "Retail sales and business conditions", "summary": "The link is plausible but less direct. November 2025 retail sales increased, while the October 2025 Bank of Canada report noted that tariffs and uncertainty weighed on activity, exports and investment.", "evaluation": "Compatible, mais moins specifique", "sources": [{"label": "StatCan retail trade November 2025", "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260123/dq260123a-eng.pdf"}, {"label": "Bank of Canada MPR October 2025", "url": "https://www.bankofcanada.ca/publications/mpr/mpr-2025-10-29/"}]}}, {"rank": 9, "date": "2025-09-01", "value": 133.54, "region": "ON", "category": "consumption_finances", "term": "investment", "detail": {"title": "Investment under trade uncertainty", "summary": "The October 2025 Bank of Canada report indicates that exports and business investment declined amid tariffs and elevated uncertainty. The September peak may anticipate or accompany that deterioration.", "evaluation": "Compatible", "sources": [{"label": "Bank of Canada MPR October 2025", "url": "https://www.bankofcanada.ca/publications/mpr/mpr-2025-10-29/"}]}}, {"rank": 10, "date": "2025-01-01", "value": 131.62, "region": "ON", "category": "trade_geopolitics", "term": "tariffs", "detail": {"title": "Tariff risk anticipation", "summary": "The January 2025 Bank of Canada report identifies the threat of new US tariffs as a major source of uncertainty and discusses an illustrative tariff and countermeasure scenario.", "evaluation": "Fortement compatible", "sources": [{"label": "Bank of Canada MPR January 2025", "url": "https://www.bankofcanada.ca/publications/mpr/mpr-2025-01-29/"}]}}, {"rank": 11, "date": "2026-04-01", "value": 130.9, "region": "ON", "category": "energy_commodities", "term": "prices", "detail": {"title": "Energy and gasoline prices", "summary": "The April 2026 CPI release indicates that CPI acceleration was driven by energy, especially gasoline, with gasoline prices up 28.6 percent year over year.", "evaluation": "Fortement compatible", "sources": [{"label": "StatCan CPI April 2026", "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260519/dq260519a-eng.htm"}]}}, {"rank": 12, "date": "2020-04-01", "value": 129.71, "region": "ON", "category": "labor_market", "term": "unemployment", "detail": {"title": "COVID unemployment continuation", "summary": "April 2020 extends the COVID labour-market shock. Statistics Canada indicates that economic shutdown and health measures were fully in place during the April reference week.", "evaluation": "Fortement compatible", "sources": [{"label": "StatCan labour force April 2020", "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/200508/dq200508a-eng.htm"}]}}, {"rank": 13, "date": "2025-10-01", "value": 128.77, "region": "ON", "category": "consumption_finances", "term": "wages", "detail": {"title": "Wages signal", "summary": "Statistics Canada reported average hourly wages up 3.5 percent year over year in October 2025. The wage signal is observable, but its link with uncertainty is weaker than tariffs, energy or unemployment peaks.", "evaluation": "Faiblement compatible", "sources": [{"label": "StatCan labour force October 2025", "url": "https://www150.statcan.gc.ca/daily-quotidien/251107/dq251107a-eng.htm"}]}}, {"rank": 14, "date": "2024-10-01", "value": 124.12, "region": "ON", "category": "monetary_policy", "term": "wages", "detail": {"title": "Wages and monetary policy", "summary": "Statistics Canada reported average hourly wages up 4.9 percent year over year in October 2024. The Bank of Canada also noted that the labour market had eased while wage growth remained high relative to productivity.", "evaluation": "Compatible, mais signal melange", "sources": [{"label": "Bank of Canada MPR October 2024", "url": "https://www.bankofcanada.ca/publications/mpr/mpr-2024-10-23/"}, {"label": "StatCan labour force October 2024", "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/241108/dq241108a-eng.htm"}]}}, {"rank": 15, "date": "2025-02-01", "value": 123.16, "region": "ON", "category": "trade_geopolitics", "term": "tariffs", "detail": {"title": "Tariff anticipation phase", "summary": "The January 2025 Bank of Canada report already indicated that tariff threats were affecting financial markets and business decisions. The February peak is consistent with an anticipation phase before March measures.", "evaluation": "Fortement compatible", "sources": [{"label": "Bank of Canada MPR January 2025", "url": "https://www.bankofcanada.ca/publications/mpr/mpr-2025-01-29/"}]}}], "correlations": [{"indicator": "unemployment_rate_pct", "label": "Taux de chomage", "lag": 2, "n": 75, "correlation": -0.408}, {"indicator": "gasoline_yoy_pct", "label": "Essence, variation annuelle", "lag": -6, "n": 70, "correlation": -0.383}, {"indicator": "unemployment_rate_change_pp", "label": "Taux de chomage, variation mensuelle", "lag": 0, "n": 76, "correlation": 0.357}, {"indicator": "target_overnight_rate_pct", "label": "Taux cible du financement a un jour", "lag": -6, "n": 71, "correlation": 0.333}, {"indicator": "cpi_all_items_mom_pct", "label": "IPC total, variation mensuelle", "lag": 3, "n": 74, "correlation": -0.229}, {"indicator": "target_overnight_rate_change_pp", "label": "Taux cible, variation mensuelle", "lag": 0, "n": 77, "correlation": -0.184}, {"indicator": "gasoline_mom_pct", "label": "Essence, variation mensuelle", "lag": -2, "n": 74, "correlation": 0.158}, {"indicator": "cpi_all_items_yoy_pct", "label": "IPC total, variation annuelle", "lag": 4, "n": 73, "correlation": 0.155}], "contemporaneous": [{"indicator": "unemployment_rate_change_pp", "label": "Taux de chomage, variation mensuelle", "lag": 0, "n": 76, "correlation": 0.357}, {"indicator": "target_overnight_rate_pct", "label": "Taux cible du financement a un jour", "lag": 0, "n": 77, "correlation": 0.233}, {"indicator": "gasoline_yoy_pct", "label": "Essence, variation annuelle", "lag": 0, "n": 76, "correlation": -0.196}, {"indicator": "unemployment_rate_pct", "label": "Taux de chomage", "lag": 0, "n": 76, "correlation": -0.194}, {"indicator": "target_overnight_rate_change_pp", "label": "Taux cible, variation mensuelle", "lag": 0, "n": 77, "correlation": -0.184}, {"indicator": "gasoline_mom_pct", "label": "Essence, variation mensuelle", "lag": 0, "n": 76, "correlation": -0.07}, {"indicator": "cpi_all_items_yoy_pct", "label": "IPC total, variation annuelle", "lag": 0, "n": 76, "correlation": 0.049}, {"indicator": "cpi_all_items_mom_pct", "label": "IPC total, variation mensuelle", "lag": 0, "n": 76, "correlation": 0.027}]}}</script>
+<script>
+const DATA = JSON.parse(document.getElementById("dashboard-data").textContent);
+const fmt = new Intl.NumberFormat("fr-CA", { maximumFractionDigits: 1 });
+const fmt3 = new Intl.NumberFormat("fr-CA", { maximumFractionDigits: 3 });
+const chart = document.getElementById("series-chart");
+const requestedVersion = new URLSearchParams(window.location.search).get("version");
+let activeVersion = DATA[requestedVersion] ? requestedVersion : "recent";
+let selectedPeakRank = null;
+
+function valueText(value, digits = 1) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return "";
+  return digits === 3 ? fmt3.format(Number(value)) : fmt.format(Number(value));
+}
+
+function setActive(version) {
+  activeVersion = version;
+  document.querySelectorAll(".switcher button").forEach((button) => {
+    button.setAttribute("aria-selected", button.dataset.version === version ? "true" : "false");
+  });
+  render(DATA[version]);
+}
+
+function render(data) {
+  document.getElementById("kpi-latest").textContent = valueText(data.latestIndex);
+  document.getElementById("kpi-date").textContent = data.latestDate.slice(0, 7);
+  document.getElementById("kpi-count").textContent = data.observations;
+  document.getElementById("kpi-cadence").textContent = data.cadence;
+  document.getElementById("series-title").textContent = data.title;
+  document.getElementById("series-caption").textContent = data.subtitle + " | " + data.dateRange;
+  document.getElementById("version-note").textContent = data.note;
+  selectedPeakRank = data.peaks.length ? data.peaks[0].rank : null;
+  renderChart(data.series);
+  renderBars("region-bars", data.regions, "province");
+  renderBars("category-bars", data.categories, "category");
+  renderPeaks(data.peaks);
+  renderPeakDetail(data.peaks);
+  renderCorrelationTable("correlation-table", data.correlations);
+  renderCorrelationTable("contemporaneous-table", data.contemporaneous);
+}
+
+function renderChart(series) {
+  const width = 980;
+  const height = 420;
+  const margin = { left: 54, right: 18, top: 18, bottom: 42 };
+  const allPoints = Object.values(series).flat();
+  const values = allPoints.map((p) => Number(p.value)).filter((v) => Number.isFinite(v));
+  const dates = [...new Set(allPoints.map((p) => p.date))].sort();
+  const minY = Math.min(...values) - 8;
+  const maxY = Math.max(...values) + 8;
+  const x = (date) => margin.left + (dates.indexOf(date) / Math.max(dates.length - 1, 1)) * (width - margin.left - margin.right);
+  const y = (value) => margin.top + (1 - ((value - minY) / Math.max(maxY - minY, 1))) * (height - margin.top - margin.bottom);
+  const midY = (minY + maxY) / 2;
+  chart.innerHTML = "";
+  const axis = [
+    line(margin.left, margin.top, margin.left, height - margin.bottom, "axis"),
+    line(margin.left, height - margin.bottom, width - margin.right, height - margin.bottom, "axis"),
+    line(margin.left, y(midY), width - margin.right, y(midY), "gridline"),
+    text(6, y(maxY) + 4, Math.round(maxY)),
+    text(6, y(midY) + 4, Math.round(midY)),
+    text(6, y(minY) + 4, Math.round(minY)),
+    text(margin.left, height - 12, dates[0].slice(0, 7)),
+    text(width - 92, height - 12, dates[dates.length - 1].slice(0, 7)),
+  ];
+  axis.forEach((node) => chart.appendChild(node));
+  ["daily", "30d", "12m"].forEach((horizon) => {
+    const points = series[horizon] || [];
+    if (!points.length) return;
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    path.setAttribute("class", "series-line line-" + horizon);
+    path.setAttribute("points", points.map((p) => `${x(p.date).toFixed(1)},${y(Number(p.value)).toFixed(1)}`).join(" "));
+    chart.appendChild(path);
+    points.forEach((p, index) => {
+      if (index % Math.max(Math.floor(points.length / 20), 1) !== 0 && index !== points.length - 1) return;
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("class", "dot line-" + horizon);
+      dot.setAttribute("cx", x(p.date));
+      dot.setAttribute("cy", y(Number(p.value)));
+      dot.setAttribute("r", 3);
+      const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+      title.textContent = `${horizon} | ${p.date} | ${valueText(p.value)}`;
+      dot.appendChild(title);
+      chart.appendChild(dot);
+    });
+  });
+}
+
+function line(x1, y1, x2, y2, className) {
+  const node = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  node.setAttribute("x1", x1);
+  node.setAttribute("y1", y1);
+  node.setAttribute("x2", x2);
+  node.setAttribute("y2", y2);
+  node.setAttribute("class", className);
+  return node;
+}
+
+function text(x, y, content) {
+  const node = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  node.setAttribute("x", x);
+  node.setAttribute("y", y);
+  node.setAttribute("font-size", "12");
+  node.setAttribute("fill", "#66707d");
+  node.textContent = content;
+  return node;
+}
+
+function renderBars(targetId, rows, key) {
+  const target = document.getElementById(targetId);
+  const maxValue = Math.max(...rows.map((row) => Number(row.value)), 1);
+  target.innerHTML = rows.slice(0, 10).map((row) => `
+    <div class="bar-row">
+      <strong>${escapeHtml(row[key])}</strong>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(3, (Number(row.value) / maxValue) * 100).toFixed(1)}%"></div></div>
+      <span class="bar-value">${valueText(row.value)}</span>
+    </div>
+  `).join("");
+}
+
+function renderPeaks(rows) {
+  document.getElementById("peaks-table").innerHTML = table(
+    ["#", "Date", "Indice", "Region", "Categorie", "Terme"],
+    rows.map((row) => [
+      `<button class="peak-button" type="button" data-peak-rank="${row.rank}"><span class="badge">${row.rank}</span></button>`,
+      row.date.slice(0, 7),
+      valueText(row.value),
+      row.region,
+      row.category,
+      row.term,
+    ]),
+    new Set([2])
+  );
+  document.querySelectorAll("[data-peak-rank]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedPeakRank = Number(button.dataset.peakRank);
+      renderPeaks(DATA[activeVersion].peaks);
+      renderPeakDetail(DATA[activeVersion].peaks);
+    });
+  });
+  document.querySelectorAll("#peaks-table tbody tr").forEach((row, index) => {
+    row.setAttribute("aria-selected", rows[index]?.rank === selectedPeakRank ? "true" : "false");
+  });
+}
+
+function renderPeakDetail(rows) {
+  const target = document.getElementById("peak-detail");
+  const peak = rows.find((row) => row.rank === selectedPeakRank) || rows[0];
+  if (!peak) {
+    target.innerHTML = "<h3>Detail du pic</h3><p>Aucun pic disponible.</p>";
+    return;
+  }
+  const detail = peak.detail || {};
+  const title = detail.title || "Note evenementielle non disponible";
+  const summary = detail.summary || "Aucune note structuree n'est encore rattachee a ce pic.";
+  const evaluation = detail.evaluation || "A documenter";
+  const sources = detail.sources || [];
+  target.innerHTML = `
+    <h3>${escapeHtml(title)}</h3>
+    <div class="detail-meta">
+      <span class="pill">${escapeHtml(peak.date.slice(0, 7))}</span>
+      <span class="pill">${escapeHtml(peak.category)}</span>
+      <span class="pill">${escapeHtml(evaluation)}</span>
+    </div>
+    <p>${escapeHtml(summary)}</p>
+    <div class="source-list">
+      ${sources.length ? sources.map((source) => `<a href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer">${escapeHtml(source.label)}</a>`).join("") : "<span>Aucune source structuree.</span>"}
+    </div>
+  `;
+}
+
+function renderCorrelationTable(targetId, rows) {
+  document.getElementById(targetId).innerHTML = table(
+    ["Indicateur", "Lag", "N", "r"],
+    rows.map((row) => [
+      row.label,
+      row.lag,
+      row.n,
+      valueText(row.correlation, 3),
+    ]),
+    new Set([1, 2, 3])
+  );
+}
+
+function table(headers, rows, numericCols) {
+  const head = `<thead><tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr></thead>`;
+  const body = rows.map((row) => `<tr>${row.map((cell, index) => `<td class="${numericCols.has(index) ? "num" : ""}">${cell}</td>`).join("")}</tr>`).join("");
+  return `<table>${head}<tbody>${body}</tbody></table>`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+document.querySelectorAll(".switcher button").forEach((button) => {
+  button.addEventListener("click", () => setActive(button.dataset.version));
+});
+setActive(activeVersion);
+</script>
+</body>
+</html>
