@@ -3,7 +3,117 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ICIE Canada</title>
+  <title>ICIE Canada — Indice Composite d'Incertitude Économique</title>
+  <meta name="description" content="Indice Composite d'Incertitude Économique (ICIE) du Canada, construit à partir des données Google Trends. Suivi de l'incertitude économique canadienne dans le temps.">
+  <meta name="author" content="Ulrich Djidonou">
+  <meta name="keywords" content="ICIE, incertitude économique, Canada, Google Trends, indice composite, economic uncertainty index, conjoncture, économie canadienne, dashboard, nowcasting">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://ulrich-e-r-djidonou.github.io/icie-dashboard/">
+  <link rel="alternate" hreflang="fr" href="https://ulrich-e-r-djidonou.github.io/icie-dashboard/">
+  <link rel="alternate" hreflang="en" href="https://ulrich-e-r-djidonou.github.io/icie-dashboard/">
+  <link rel="alternate" hreflang="x-default" href="https://ulrich-e-r-djidonou.github.io/icie-dashboard/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ulrich-e-r-djidonou.github.io/icie-dashboard/">
+  <meta property="og:site_name" content="ICIE Canada">
+  <meta property="og:title" content="ICIE Canada — Indice Composite d'Incertitude Économique">
+  <meta property="og:description" content="Indice Composite d'Incertitude Économique (ICIE) du Canada basé sur Google Trends. Suivez l'évolution de l'incertitude économique canadienne.">
+  <meta property="og:locale" content="fr_CA">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ICIE Canada — Indice Composite d'Incertitude Économique">
+  <meta name="twitter:description" content="Indice Composite d'Incertitude Économique du Canada basé sur Google Trends.">
+  <meta name="twitter:creator" content="@ulrichdjidonou">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/#website",
+        "url": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/",
+        "name": "ICIE Canada",
+        "description": "Indice Composite d'Incertitude Économique du Canada basé sur Google Trends.",
+        "inLanguage": ["fr", "en"],
+        "author": { "@id": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/#author" }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/#author",
+        "name": "Ulrich Djidonou",
+        "url": "https://github.com/ulrich-e-r-djidonou",
+        "jobTitle": "Économiste",
+        "description": "Économiste spécialisé en inférence causale et machine learning, basé au Québec.",
+        "sameAs": [
+          "https://www.linkedin.com/in/ulrich-djidonou/",
+          "https://github.com/ulrich-e-r-djidonou"
+        ]
+      },
+      {
+        "@type": "Dataset",
+        "@id": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/#dataset",
+        "name": "Indice Composite d'Incertitude Économique (ICIE) du Canada",
+        "description": "Série temporelle de l'Indice Composite d'Incertitude Économique du Canada, construite à partir de requêtes Google Trends liées à l'incertitude économique, monétaire et géopolitique.",
+        "url": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/",
+        "creator": { "@id": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/#author" },
+        "spatialCoverage": { "@type": "Country", "name": "Canada" },
+        "isBasedOn": "https://trends.google.com/",
+        "keywords": ["incertitude économique", "ICIE", "Google Trends", "Canada", "indice composite", "nowcasting", "conjoncture"],
+        "license": "https://opensource.org/licenses/MIT",
+        "inLanguage": ["fr", "en"],
+        "variableMeasured": [
+          { "@type": "PropertyValue", "name": "Indice Composite d'Incertitude Économique (ICIE)" },
+          { "@type": "PropertyValue", "name": "Intérêt de recherche Google Trends" }
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/#webpage",
+        "url": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/",
+        "name": "ICIE Canada — Indice Composite d'Incertitude Économique",
+        "isPartOf": { "@id": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/#website" },
+        "about": { "@id": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/#dataset" },
+        "author": { "@id": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/#author" },
+        "inLanguage": ["fr", "en"]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://ulrich-e-r-djidonou.github.io/icie-dashboard/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Qu'est-ce que l'Indice Composite d'Incertitude Économique (ICIE) ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "L'ICIE est un indice construit par l'économiste Ulrich Djidonou qui mesure l'incertitude économique au Canada à partir de données Google Trends. Il agrège l'intérêt de recherche pour des termes liés à l'incertitude économique, monétaire et géopolitique afin de suivre son évolution dans le temps."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Comment l'ICIE est-il calculé ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "L'ICIE combine plusieurs séries Google Trends associées à l'incertitude économique au Canada en un indice composite normalisé. La méthode s'inspire des approches de nowcasting qui utilisent les données de recherche en ligne comme indicateur avancé du sentiment économique."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the Canadian Economic Uncertainty Composite Index (ICIE)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The ICIE is a composite index built by economist Ulrich Djidonou that tracks economic uncertainty in Canada using Google Trends data. It aggregates search interest for terms related to economic, monetary, and geopolitical uncertainty to monitor how it evolves over time."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
   <style>
     :root {
       color-scheme: light;
