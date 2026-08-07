@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f5a96'/%3E%3Cpath d='M6 21 L12 15 L17 19 L26 8' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <title>ICIE Canada — Indice Composite d'Incertitude Économique</title>
   <meta name="description" content="Indice Composite d'Incertitude Économique (ICIE) du Canada, construit à partir des données Google Trends. Suivi de l'incertitude économique canadienne dans le temps.">
   <meta name="author" content="Ulrich Djidonou">
@@ -143,6 +144,19 @@
       outline: 3px solid var(--focus);
       outline-offset: 3px;
     }
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: var(--ink);
+      color: #fff;
+      padding: 10px 16px;
+      z-index: 10;
+      border-radius: 0 0 8px 0;
+    }
+    .skip-link:focus {
+      left: 0;
+    }
     .shell {
       max-width: 1340px;
       margin: 0 auto;
@@ -192,10 +206,15 @@
       min-height: 38px;
       min-width: 0;
       white-space: normal;
+      transition: background-color 0.15s ease, color 0.15s ease;
     }
     .switcher button[aria-selected="true"] {
       background: var(--ink);
       color: #fff;
+    }
+    .switcher button:not([aria-selected="true"]):hover {
+      background: #ece7dd;
+      color: var(--ink);
     }
     main {
       display: grid;
@@ -240,6 +259,9 @@
       padding: 18px;
       min-width: 0;
       max-width: 100%;
+    }
+    .section-primary {
+      border-top: 3px solid var(--blue);
     }
     .section-head {
       display: flex;
@@ -501,6 +523,7 @@
   </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Aller au contenu principal</a>
 <div class="shell">
   <header>
     <div>
@@ -512,7 +535,7 @@
       <button type="button" data-version="historical" aria-selected="false">v1.3 historique</button>
     </nav>
   </header>
-  <main>
+  <main id="main-content">
     <div class="kpis" aria-label="Indicateurs cles">
       <div class="kpi"><span>Derniere valeur</span><strong id="kpi-latest"></strong></div>
       <div class="kpi"><span>Date recente</span><strong id="kpi-date"></strong></div>
@@ -520,7 +543,7 @@
       <div class="kpi"><span>Frequence</span><strong id="kpi-cadence"></strong></div>
     </div>
     <div class="workspace">
-      <section>
+      <section class="section-primary">
         <div class="section-head">
           <div>
             <h2 id="series-title">Serie Canada</h2>
