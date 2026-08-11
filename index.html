@@ -585,7 +585,7 @@
         <div class="chart-wrap">
           <table id="sr-table" class="sr-only"></table>
           <svg id="series-chart" viewBox="0 0 980 420" role="img" aria-label="Série ICIE Canada"></svg>
-          <div class="legend"><span>daily</span><span>30d</span><span>12m</span></div>
+          <div class="legend"><span>Quotidien</span><span>Moy. 30 j</span><span>Moy. 12 mois</span></div>
         </div>
       </section>
       <section>
@@ -651,6 +651,28 @@ const DATA = JSON.parse(document.getElementById("dashboard-data").textContent);
 const fmt = new Intl.NumberFormat("fr-CA", { maximumFractionDigits: 1 });
 const fmt3 = new Intl.NumberFormat("fr-CA", { maximumFractionDigits: 3 });
 const chart = document.getElementById("series-chart");
+// Les codes de categorie ("business_conditions", etc.) sont des identifiants
+// internes issus des donnees : ils ne changent pas, seul leur affichage est
+// traduit. horizonLabel fait la meme chose pour "daily"/"30d"/"12m", qui
+// restent les identifiants utilises par les classes CSS et les cles JSON.
+const CATEGORY_LABELS = {
+  business_conditions: "Conditions d'affaires",
+  consumption_finances: "Consommation et finances",
+  energy_commodities: "Energie et matieres premieres",
+  housing_credit: "Logement et credit",
+  inflation_prices: "Inflation et prix",
+  labor_market: "Marche du travail",
+  macro_conditions: "Conditions macroeconomiques",
+  monetary_policy: "Politique monetaire",
+  trade_geopolitics: "Commerce et geopolitique",
+};
+const HORIZON_LABELS = { daily: "Quotidien", "30d": "Moy. 30 j", "12m": "Moy. 12 mois" };
+function categoryLabel(code) {
+  return CATEGORY_LABELS[code] || code;
+}
+function horizonLabel(code) {
+  return HORIZON_LABELS[code] || code;
+}
 const requestedVersion = new URLSearchParams(window.location.search).get("version");
 let activeVersion = DATA[requestedVersion] ? requestedVersion : "recent";
 let selectedPeakRank = null;
@@ -726,14 +748,14 @@ function renderChart(series) {
       dot.setAttribute("r", 3);
       dot.setAttribute("tabindex", "0");
       const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-      title.textContent = `${horizon} | ${p.date} | ${valueText(p.value)}`;
+      title.textContent = `${horizonLabel(horizon)} | ${p.date} | ${valueText(p.value)}`;
       dot.appendChild(title);
       chart.appendChild(dot);
     });
   });
 
   const srTable = document.getElementById("sr-table");
-  const thead = `<thead><tr><th>Date</th><th>Daily</th><th>30d</th><th>12m</th></tr></thead>`;
+  const thead = `<thead><tr><th>Date</th><th>${horizonLabel("daily")}</th><th>${horizonLabel("30d")}</th><th>${horizonLabel("12m")}</th></tr></thead>`;
   const tbody = `<tbody>${dates.map(d => {
     const dVal = series.daily?.find(p => p.date === d)?.value;
     const d30Val = series["30d"]?.find(p => p.date === d)?.value;
@@ -766,9 +788,11 @@ function text(x, y, content) {
 function renderBars(targetId, rows, key) {
   const target = document.getElementById(targetId);
   const maxValue = Math.max(...rows.map((row) => Number(row.value)), 1);
+  // Les provinces (AB, QC...) sont deja des codes lisibles tels quels ; seule
+  // la categorie a besoin d'une traduction de son identifiant interne.
   target.innerHTML = rows.slice(0, 10).map((row) => `
     <div class="bar-row">
-      <strong>${escapeHtml(row[key])}</strong>
+      <strong>${escapeHtml(key === "category" ? categoryLabel(row[key]) : row[key])}</strong>
       <div class="bar-track"><div class="bar-fill" style="width:${Math.max(3, (Number(row.value) / maxValue) * 100).toFixed(1)}%"></div></div>
       <span class="bar-value">${valueText(row.value)}</span>
     </div>
@@ -783,7 +807,7 @@ function renderPeaks(rows) {
       row.date.slice(0, 7),
       valueText(row.value),
       row.region,
-      row.category,
+      categoryLabel(row.category),
       row.term,
     ]),
     new Set([2])
@@ -816,7 +840,7 @@ function renderPeakDetail(rows) {
     <h3>${escapeHtml(title)}</h3>
     <div class="detail-meta">
       <span class="pill">${escapeHtml(peak.date.slice(0, 7))}</span>
-      <span class="pill">${escapeHtml(peak.category)}</span>
+      <span class="pill">${escapeHtml(categoryLabel(peak.category))}</span>
       <span class="pill">${escapeHtml(evaluation)}</span>
     </div>
     <p>${escapeHtml(summary)}</p>
