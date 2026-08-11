@@ -1,8 +1,8 @@
-﻿# CLAUDE.md
+# CLAUDE.md
 
-Depot public de publication statique du dashboard ICIE.
+Dépôt public de publication statique du dashboard ICIE.
 
-Regles :
+Règles :
 - Ne pas ajouter le code source du projet `gtrends`.
-- Ne pas ajouter les donnees brutes ou intermediaires.
-- Ne publier que les artefacts statiques necessaires au dashboard.
+- Ne pas ajouter les données brutes ou intermédiaires.
+- Ne publier que les artefacts statiques nécessaires au dashboard.
