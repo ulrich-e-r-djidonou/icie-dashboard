@@ -3,13 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'none'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f5a96'/%3E%3Cpath d='M6 21 L12 15 L17 19 L26 8' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <title>ICIE Canada — Indice Composite d'Incertitude Économique</title>
   <meta name="description" content="Indice Composite d'Incertitude Économique (ICIE) du Canada, construit à partir des données Google Trends. Suivi de l'incertitude économique canadienne dans le temps.">
   <meta name="author" content="Ulrich Djidonou">
   <meta name="keywords" content="ICIE, incertitude économique, Canada, Google Trends, indice composite, economic uncertainty index, conjoncture, économie canadienne, dashboard, nowcasting">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://ulrich-e-r-djidonou.github.io/icie-dashboard/">
+  <link rel="canonical" href="https://djidonou.com/icie-dashboard/">
   <!-- Le tableau de bord n'existe qu'en francais. Un hreflang="en" a longtemps
        pointe vers cette meme page francaise : il annoncait a Google une version
        anglaise inexistante, et un lecteur anglophone arrivait sur du francais.
@@ -809,9 +811,9 @@ function renderPeaks(rows) {
       `<button class="peak-button" type="button" data-peak-rank="${row.rank}"><span class="badge">${row.rank}</span></button>`,
       row.date.slice(0, 7),
       valueText(row.value),
-      row.region,
-      categoryLabel(row.category),
-      row.term,
+      escapeHtml(row.region),
+      escapeHtml(categoryLabel(row.category)),
+      escapeHtml(row.term),
     ]),
     new Set([2])
   );
@@ -848,7 +850,7 @@ function renderPeakDetail(rows) {
     </div>
     <p>${escapeHtml(summary)}</p>
     <div class="source-list">
-      ${sources.length ? sources.map((source) => `<a href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer">${escapeHtml(source.label)}</a>`).join("") : "<span>Aucune source structurée.</span>"}
+      ${sources.length ? sources.map((source) => `<a href="${safeUrl(source.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.label)}</a>`).join("") : "<span>Aucune source structurée.</span>"}
     </div>
   `;
 }
@@ -857,9 +859,9 @@ function renderCorrelationTable(targetId, rows) {
   document.getElementById(targetId).innerHTML = table(
     ["Indicateur", "Lag", "N", "r"],
     rows.map((row) => [
-      row.label,
-      row.lag,
-      row.n,
+      escapeHtml(row.label),
+      escapeHtml(row.lag),
+      escapeHtml(row.n),
       valueText(row.correlation, 3),
     ]),
     new Set([1, 2, 3])
@@ -870,6 +872,13 @@ function table(headers, rows, numericCols) {
   const head = `<thead><tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join("")}</tr></thead>`;
   const body = rows.map((row) => `<tr>${row.map((cell, index) => `<td class="${numericCols.has(index) ? "num" : ""}">${cell}</td>`).join("")}</tr>`).join("");
   return `<table>${head}<tbody>${body}</tbody></table>`;
+}
+
+// escapeHtml neutralise le HTML mais pas un href javascript: ; les URL de
+// sources passent par safeUrl.
+function safeUrl(value) {
+  const url = String(value ?? "").trim();
+  return /^https?:\/\//i.test(url) ? escapeHtml(url) : "#";
 }
 
 function escapeHtml(value) {
