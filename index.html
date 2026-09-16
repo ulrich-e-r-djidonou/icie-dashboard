@@ -714,8 +714,8 @@ function renderPeaks(rows) {
   document.getElementById("peaks-table").innerHTML = table(
     ["#", "Date", "Indice", "Region", "Categorie", "Terme"],
     rows.map((row) => [
-      `<button class="peak-button" type="button" data-peak-rank="${row.rank}"><span class="badge">${row.rank}</span></button>`,
-      row.date.slice(0, 7),
+      `<button class="peak-button" type="button" data-peak-rank="${Number(row.rank)}"><span class="badge">${Number(row.rank)}</span></button>`,
+      escapeHtml(row.date.slice(0, 7)),
       valueText(row.value),
       escapeHtml(row.region),
       escapeHtml(row.category),
@@ -766,8 +766,8 @@ function renderCorrelationTable(targetId, rows) {
     ["Indicateur", "Lag", "N", "r"],
     rows.map((row) => [
       escapeHtml(row.label),
-      row.lag,
-      row.n,
+      Number(row.lag),
+      Number(row.n),
       valueText(row.correlation, 3),
     ]),
     new Set([1, 2, 3])
@@ -784,7 +784,9 @@ function table(headers, rows, numericCols) {
 // sources passent par safeUrl.
 function safeUrl(value) {
   const url = String(value ?? "").trim();
-  return /^https?:\/\//i.test(url) ? escapeHtml(url) : "#";
+  // Regex construite depuis une chaine, pour rester identique au gabarit
+  // du generateur (gtrends), qui est une f-string Python.
+  return new RegExp("^https?://", "i").test(url) ? escapeHtml(url) : "#";
 }
 
 function escapeHtml(value) {
